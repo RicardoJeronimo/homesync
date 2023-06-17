@@ -8,15 +8,19 @@ checkMountpoint() {
 	fi
 }
 
+checkDependencies() {
+	dependencies="unison inotifywait"
+
+	for dep in $dependencies; do
+		if [ ! "$(command -v $dep)" ]; then
+			fatal "[ERROR] Command $dep not installed." 
+		fi
+	done
+}
+
 checkLock() {
 	exec {LOCK}>/var/lock/homesync-"$USER".lock 
 	flock -x -n ${LOCK} || fatal "[ERROR] Homesync already running for user $USER."
-}
-
-checkUnison() {
-	if [ ! "$(command -v unison)" ]; then
-		fatal "[ERROR] Unison not installed." 
-	fi
 }
 
 debug() {
@@ -226,7 +230,7 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 		case $arg in
 			a)
 				checkLock
-				checkUnison
+				checkDependencies
 				debug
 
 				if checkMountpoint "$HOME"; then
@@ -265,7 +269,7 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 			;;
 			r)
 				checkLock
-				checkUnison
+				checkDependencies
 				debug
 
 				if checkMountpoint "$HOME"; then
@@ -275,7 +279,7 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 				exit
 			;;
 			s)
-				checkUnison
+				checkDependencies
 				debug
 
 				if checkMountpoint "$HOME"; then
