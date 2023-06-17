@@ -233,7 +233,6 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 					setupHome
 					syncHome
 					symlinksStorage true
-					
 					syncHandler 
 				else
 					symlinksStorage false
@@ -265,6 +264,7 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 				exit
 			;;
 			r)
+				checkLock
 				checkUnison
 				debug
 
