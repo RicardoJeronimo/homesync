@@ -12,7 +12,7 @@ checkDependencies() {
 	dependencies="unison inotifywait"
 
 	for dep in $dependencies; do
-		if [ ! "$(command -v $dep)" ]; then
+		if [ ! "$(command -v "$dep")" ]; then
 			fatal "[ERROR] Command $dep not installed." 
 		fi
 	done
@@ -226,7 +226,7 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 		read -r -a homeDirs <<< "$(getConfig global HOME_DIRS)"
 		read -r -a homeFiles <<< "$(getConfig global HOME_FILES)"
 
-		while getopts 'adhlrs' arg; do
+		while getopts 'adhklrs' arg; do
 		case $arg in
 			a)
 				checkLock
@@ -255,6 +255,9 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 			h)
 				usage
 				exit 
+			;;
+			k)
+				pkill -P "$(ps -t "$(tty)" -o pid,comm | grep homesync | head -1 | sed 's/^ //g' | cut -d " " -f 1)"
 			;;
 			l)
 				debug
