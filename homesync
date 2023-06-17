@@ -8,6 +8,11 @@ checkMountpoint() {
 	fi
 }
 
+checkLock() {
+	exec {LOCK}>/var/lock/homesync-"$USER".lock 
+	flock -x -n ${LOCK} || fatal "[ERROR] Homesync already running for user $USER."
+}
+
 checkUnison() {
 	if [ ! "$(command -v unison)" ]; then
 		fatal "[ERROR] Unison not installed." 
@@ -220,6 +225,7 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 		while getopts 'adhlrs' arg; do
 		case $arg in
 			a)
+				checkLock
 				checkUnison
 				debug
 
@@ -227,7 +233,8 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 					setupHome
 					syncHome
 					symlinksStorage true
-					syncHandler
+					
+					syncHandler 
 				else
 					symlinksStorage false
 				fi
