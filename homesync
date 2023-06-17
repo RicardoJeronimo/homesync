@@ -196,13 +196,17 @@ syncWatch() {
 }
 
 usage() {
-	echo "$0 [-a] [-d] [-h] [-l] [-r] [-s]"
-	echo "-a: Online: Syncs home directory and network share. Offline: Changes symlinks to local storage"
-	echo "-d: Sets up local home directory structure"
-	echo "-h: Shows this help message and exits"
-	echo "-l: Sets up home directory symbolic links according to mount status"
-	echo "-r: Only syncs network share"
-	echo "-s: Only syncs home directory"
+	cat <<-EOF
+	Usage: homesync -arg
+	    -a  Online: Sync roaming home with local home, and network share with local storage 
+	        Offline: Change symlinks to local storage 
+	    -d	Setup local home directory structure
+	    -h	Show this help message and exit
+	    -k	Kill all homesync processes started by the user
+	    -l	Setup home directory symlinks according to mount status
+	    -r	Only sync network share with local storage
+	    -s	Only sync roaming home with local home
+	EOF
 }
 
 if [ $# -gt 0 ] && [[ $1 == -* ]]; then
@@ -302,6 +306,7 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 		fatal "[ERROR] Configuration file not found." 
 	fi
 else
+	echo "$0: missing argument"
 	usage
 	exit 1
 fi
