@@ -257,7 +257,8 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 				exit 
 			;;
 			k)
-				pkill -P "$(ps -t "$(tty)" -o pid,comm | grep homesync | head -1 | sed 's/^ //g' | cut -d " " -f 1)"
+				pkill -P "$(pgrep -t "$(tty | cut -d "/" -f 3-)" -o homesync)"
+				exit
 			;;
 			l)
 				debug
