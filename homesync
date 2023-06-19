@@ -99,7 +99,6 @@ setupHome() {
             touch "$homeLocal"/.bash_history
         elif [ "$userShell" == "/bin/zsh" ]; then
             touch "$homeLocal"/.zsh_history
-            mkdir -p "$homeLocal"/.oh-my-zsh
         fi
 
         chmod -R 700 "$homeLocal"
@@ -111,7 +110,6 @@ setupHome() {
             cp /etc/skel/.{bash_logout,bashrc} "$HOME"
         elif [ "$userShell" == "/bin/zsh" ]; then
             ln -sf "$homeLocal"/.zsh_history "$HOME"/.zsh_history
-            ln -sf "$homeLocal"/.oh-my-zsh "$HOME"/.oh-my-zsh
             touch "$HOME"/.zshrc
         fi
 
