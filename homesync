@@ -111,6 +111,7 @@ setupHome() {
         elif [ "$userShell" == "/bin/zsh" ]; then
             ln -sf "$homeLocal"/.zsh_history "$HOME"/.zsh_history
             touch "$HOME"/.zshrc
+            echo "homesync -a" >> "$HOME"/.zprofile
         fi
 
         cp /etc/skel/.profile "$HOME"
