@@ -20,7 +20,7 @@ checkDependencies() {
 
 checkLock() {
     exec {LOCK}>/var/lock/homesync-"$USER".lock 
-    flock -x -n ${LOCK} || fatal "[ERROR] Homesync already running for user $USER."
+    flock -x -n ${LOCK} || fatal "[INFO] Homesync already running for user $USER."
 }
 
 debug() {
