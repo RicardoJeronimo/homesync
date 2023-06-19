@@ -198,15 +198,15 @@ syncWatch() {
 
 usage() {
     cat <<-EOF
-    Usage: homesync -arg
-        -a  Online: Sync roaming home with local home, and network share with local storage 
-            Offline: Change symlinks to local storage 
-        -d	Setup local home directory structure
-        -h	Show this help message and exit
-        -k	Kill all homesync processes started by the user
-        -l	Setup home directory symlinks according to mount status
-        -r	Only sync network share with local storage
-        -s	Only sync roaming home with local home
+	Usage: homesync -arg
+	    -a  Online: Sync roaming home with local home, and network share with local storage 
+	        Offline: Change symlinks to local storage 
+	    -d	Setup local home directory structure
+	    -h	Show this help message and exit
+	    -k	Kill all homesync processes started by the user
+	    -l	Setup home directory symlinks according to mount status
+	    -r	Only sync network share with local storage
+	    -s	Only sync roaming home with local home
 	EOF
 }
 
