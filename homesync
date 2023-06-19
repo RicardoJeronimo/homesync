@@ -186,14 +186,14 @@ syncRemote() {
 
             syncMain "$storageRemote" "$storageLocal"
         done }
-    }
+}
 
 syncWatch() {
     { inotifywait -r -m "$storageRemote" -e create --format "%w|%f" |
         while IFS='|' read -r dir file; do
             chmod g-w "$dir""$file"
         done }
-    }
+}
 
 usage() {
     cat <<-EOF
