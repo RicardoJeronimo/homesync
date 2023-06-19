@@ -9,9 +9,9 @@ checkMountpoint() {
 }
 
 checkDependencies() {
-    dependencies="inotifywait ldapsearch unison"
+    dependencies=("inotifywait" "ldapsearch" "unison")
 
-    for dep in $dependencies; do
+    for dep in "${dependencies[@]}"; do
         if [ ! "$(command -v "$dep")" ]; then
             fatal "[ERROR] Command $dep not installed." 
         fi
