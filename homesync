@@ -9,7 +9,7 @@ checkMountpoint() {
 }
 
 checkDependencies() {
-    dependencies="unison inotifywait"
+    dependencies="inotifywait ldapsearch unison"
 
     for dep in $dependencies; do
         if [ ! "$(command -v "$dep")" ]; then
