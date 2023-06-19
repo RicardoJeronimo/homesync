@@ -1,312 +1,312 @@
 #!/bin/bash
 
 checkMountpoint() {
-	if mountpoint -q "$1"; then
-		true
-	else
-		false
-	fi
+    if mountpoint -q "$1"; then
+        true
+    else
+        false
+    fi
 }
 
 checkDependencies() {
-	dependencies="unison inotifywait"
+    dependencies="unison inotifywait"
 
-	for dep in $dependencies; do
-		if [ ! "$(command -v "$dep")" ]; then
-			fatal "[ERROR] Command $dep not installed." 
-		fi
-	done
+    for dep in $dependencies; do
+        if [ ! "$(command -v "$dep")" ]; then
+            fatal "[ERROR] Command $dep not installed." 
+        fi
+    done
 }
 
 checkLock() {
-	exec {LOCK}>/var/lock/homesync-"$USER".lock 
-	flock -x -n ${LOCK} || fatal "[ERROR] Homesync already running for user $USER."
+    exec {LOCK}>/var/lock/homesync-"$USER".lock 
+    flock -x -n ${LOCK} || fatal "[ERROR] Homesync already running for user $USER."
 }
 
 debug() {
-	if [ "$(getConfig global DEBUG)" == "true" ]; then
-		logfile=$(getConfig global LOG_FILE | sed "s|~|$HOME|")
+    if [ "$(getConfig global DEBUG)" == "true" ]; then
+        logfile=$(getConfig global LOG_FILE | sed "s|~|$HOME|")
 
-		if [ ! -f "$logfile" ]; then
-			touch "$logfile"
-		fi
+        if [ ! -f "$logfile" ]; then
+            touch "$logfile"
+        fi
 
-		exec 3>&1 1>"$logfile" 2>&1
-		trap '{ set +x; } 2>/dev/null; echo -n "[$(date "+%d/%m/%Y %R")]  "; set -x' DEBUG
-	fi
+        exec 3>&1 1>"$logfile" 2>&1
+        trap '{ set +x; } 2>/dev/null; echo -n "[$(date "+%d/%m/%Y %R")]  "; set -x' DEBUG
+    fi
 }
 
 fatal() {
-	echo "$@" >&2
-	kill -10 $proc
+    echo "$@" >&2
+    kill -10 $proc
 }
 
 getConfig() {
-	val=$(awk '/^\[.*\]$/{obj=$0}/=/{print obj $0}' "$conf" | grep '^\['"$1"'\]'"$2"' = ' | sed -r 's/^([^=]+)= //')
+    val=$(awk '/^\[.*\]$/{obj=$0}/=/{print obj $0}' "$conf" | grep '^\['"$1"'\]'"$2"' = ' | sed -r 's/^([^=]+)= //')
 
-	if [ -z "$val" ]; then
-		if [ "$1" != "global" ]; then
-			getConfig global "$2"
-		else
-			fatal "[ERROR] Configuration $2 not found in $conf."
-		fi
-	else
-		echo "$val"
-	fi
+    if [ -z "$val" ]; then
+        if [ "$1" != "global" ]; then
+            getConfig global "$2"
+        else
+            fatal "[ERROR] Configuration $2 not found in $conf."
+        fi
+    else
+        echo "$val"
+    fi
 }
 
 getMachine() {
-	ldapsearch -x -LLL -H "$ldapURL" -b "$ldapDN" cn="$USER" | grep "$ldapMachineAttribute" | tr -d " " | cut -d ":" -f 2
+    ldapsearch -x -LLL -H "$ldapURL" -b "$ldapDN" cn="$USER" | grep "$ldapMachineAttribute" | tr -d " " | cut -d ":" -f 2
 }
 
 getName() {
-	getent passwd "$USER" | cut -d ":" -f 5 | cut -d " " -f 1
+    getent passwd "$USER" | cut -d ":" -f 5 | cut -d " " -f 1
 }
 
 getShell() {
-	getent passwd "$USER" | cut -d ":" -f 7
+    getent passwd "$USER" | cut -d ":" -f 7
 }
 
 setupHome() {
-	userShell=$(getShell)
+    userShell=$(getShell)
 
-	if [ ! -d "$storageRemote" ] || [ -z "$(ls -A "$storageRemote")" ]; then
-		for dir in "${storageDirsSync[@]}"; do
-			mkdir -p "$storageRemote"/"$dir"
-		done
+    if [ ! -d "$storageRemote" ] || [ -z "$(ls -A "$storageRemote")" ]; then
+        for dir in "${storageDirsSync[@]}"; do
+            mkdir -p "$storageRemote"/"$dir"
+        done
 
-		chmod -R 750 "$storageRemote"
-	fi
+        chmod -R 750 "$storageRemote"
+    fi
 
-	if [ ! -d "$storageLocal" ] || [ -z "$(ls -A "$storageLocal")" ]; then
-		for dir in "${storageDirsNoSync[@]}"; do
-			mkdir -p "$storageLocal"/"$dir"
-		done
+    if [ ! -d "$storageLocal" ] || [ -z "$(ls -A "$storageLocal")" ]; then
+        for dir in "${storageDirsNoSync[@]}"; do
+            mkdir -p "$storageLocal"/"$dir"
+        done
 
-		chmod -R 750 "$storageLocal"
-	fi
+        chmod -R 750 "$storageLocal"
+    fi
 
-	if [ ! -d "$homeLocal" ] || [ -z "$(ls -A "$homeLocal")" ]; then
-		for dir in "${homeDirs[@]}"; do
-			mkdir -p "$homeLocal"/"$dir"
-		done
+    if [ ! -d "$homeLocal" ] || [ -z "$(ls -A "$homeLocal")" ]; then
+        for dir in "${homeDirs[@]}"; do
+            mkdir -p "$homeLocal"/"$dir"
+        done
 
-		for file in "${homeFiles[@]}"; do
-			touch "$homeLocal"/"$file"
-		done
+        for file in "${homeFiles[@]}"; do
+            touch "$homeLocal"/"$file"
+        done
 
-		if [ "$userShell" == "/bin/bash" ]; then
-			touch "$homeLocal"/.bash_history
-		elif [ "$userShell" == "/bin/zsh" ]; then
-			touch "$homeLocal"/.zsh_history
-			mkdir -p "$homeLocal"/.oh-my-zsh
-		fi
+        if [ "$userShell" == "/bin/bash" ]; then
+            touch "$homeLocal"/.bash_history
+        elif [ "$userShell" == "/bin/zsh" ]; then
+            touch "$homeLocal"/.zsh_history
+            mkdir -p "$homeLocal"/.oh-my-zsh
+        fi
 
-		chmod -R 700 "$homeLocal"
-	fi
+        chmod -R 700 "$homeLocal"
+    fi
 
-	if [ ! -d "$HOME" ] || [ -z "$(ls -A "$HOME")" ]; then
-		if [ "$userShell" == "/bin/bash" ]; then
-			ln -sf "$homeLocal"/.bash_history "$HOME"/.bash_history
-			cp /etc/skel/.{bash_logout,bashrc} "$HOME"
-		elif [ "$userShell" == "/bin/zsh" ]; then
-			ln -sf "$homeLocal"/.zsh_history "$HOME"/.zsh_history
-			ln -sf "$homeLocal"/.oh-my-zsh "$HOME"/.oh-my-zsh
-			touch "$HOME"/.zshrc
-		fi
+    if [ ! -d "$HOME" ] || [ -z "$(ls -A "$HOME")" ]; then
+        if [ "$userShell" == "/bin/bash" ]; then
+            ln -sf "$homeLocal"/.bash_history "$HOME"/.bash_history
+            cp /etc/skel/.{bash_logout,bashrc} "$HOME"
+        elif [ "$userShell" == "/bin/zsh" ]; then
+            ln -sf "$homeLocal"/.zsh_history "$HOME"/.zsh_history
+            ln -sf "$homeLocal"/.oh-my-zsh "$HOME"/.oh-my-zsh
+            touch "$HOME"/.zshrc
+        fi
 
-		cp /etc/skel/.profile "$HOME"
+        cp /etc/skel/.profile "$HOME"
 
-		for dir in "${homeDirs[@]}"; do
-			ln -snf "$homeLocal"/"$dir" "$HOME"/"$dir"
-		done
+        for dir in "${homeDirs[@]}"; do
+            ln -snf "$homeLocal"/"$dir" "$HOME"/"$dir"
+        done
 
-		for file in "${homeFiles[@]}"; do
-			ln -sf "$homeLocal"/"$file" "$HOME"/"$file"
-		done
-	fi
+        for file in "${homeFiles[@]}"; do
+            ln -sf "$homeLocal"/"$file" "$HOME"/"$file"
+        done
+    fi
 }
 
 symlinksStorage() {
-	if [ "$1" == "true" ]; then
-		origin="$storageRemote"
-	else
-		origin="$storageLocal"
-	fi
+    if [ "$1" == "true" ]; then
+        origin="$storageRemote"
+    else
+        origin="$storageLocal"
+    fi
 
-	for dir in "${storageDirsSync[@]}"; do
-		ln -snf "$origin"/"$dir" "$HOME"/"$dir"
-	done
+    for dir in "${storageDirsSync[@]}"; do
+        ln -snf "$origin"/"$dir" "$HOME"/"$dir"
+    done
 
-	for dir in "${storageDirsNoSync[@]}"; do
-		ln -snf "$storageLocal"/"$dir" "$HOME"/"$dir"
-	done
+    for dir in "${storageDirsNoSync[@]}"; do
+        ln -snf "$storageLocal"/"$dir" "$HOME"/"$dir"
+    done
 
-	ln -snf "$origin" "$HOME"/"$storageLocalName"
+    ln -snf "$origin" "$HOME"/"$storageLocalName"
 }
 
 syncHandler() {
-	if checkMountpoint "$(echo "$storageRemote" | cut -d "/" -f -2)"; then
-		if [ "$HOSTNAME" == "$(getMachine)" ]; then
-			syncRemote & 
-		else
-			syncWatch &
-		fi   
-	fi
+    if checkMountpoint "$(echo "$storageRemote" | cut -d "/" -f -2)"; then
+        if [ "$HOSTNAME" == "$(getMachine)" ]; then
+            syncRemote & 
+        else
+            syncWatch &
+        fi   
+    fi
 }
 
 syncHome() {
-	mount "$bindPath"
-	syncMain "$HOME" "$bindPath""$HOME"
-	umount "$bindPath"
+    mount "$bindPath"
+    syncMain "$HOME" "$bindPath""$HOME"
+    umount "$bindPath"
 }
 
 syncMain() {
-	if [ ! -d "$2" ]; then
-		cp -rp "$1" "$2"
-	elif [ -z "$(ls -A "$2")" ]; then
-		cp -rp "$1"/* "$2"
-	else
-		if [ "$1" == "$HOME" ]; then
-			unison "${unisonArgs[@]}" "$1" "$2"
-		else
-			unison "${unisonArgs[@]}" "${storageDirsSync[@]/#/-path=}" "$1" "$2"
-		fi
-	fi
+    if [ ! -d "$2" ]; then
+        cp -rp "$1" "$2"
+    elif [ -z "$(ls -A "$2")" ]; then
+        cp -rp "$1"/* "$2"
+    else
+        if [ "$1" == "$HOME" ]; then
+            unison "${unisonArgs[@]}" "$1" "$2"
+        else
+            unison "${unisonArgs[@]}" "${storageDirsSync[@]/#/-path=}" "$1" "$2"
+        fi
+    fi
 }
 
 syncRemote() {
-	syncMain "$storageRemote" "$storageLocal"
+    syncMain "$storageRemote" "$storageLocal"
 
-	 { inotifywait -r -m "$storageRemote" -e create -e delete -e modify -e move -e attrib --format "%w|%e|%f" |
-	while IFS='|' read -r dir action file; do
-		if [[ "$action" == *"CREATE"* ]]; then
-			chmod g-w "$dir""$file"
-		fi
+    { inotifywait -r -m "$storageRemote" -e create -e delete -e modify -e move -e attrib --format "%w|%e|%f" |
+        while IFS='|' read -r dir action file; do
+            if [[ "$action" == *"CREATE"* ]]; then
+                chmod g-w "$dir""$file"
+            fi
 
-		syncMain "$storageRemote" "$storageLocal"
-	done }
-}
+            syncMain "$storageRemote" "$storageLocal"
+        done }
+    }
 
 syncWatch() {
-	{ inotifywait -r -m "$storageRemote" -e create --format "%w|%f" |
-	while IFS='|' read -r dir file; do
-		chmod g-w "$dir""$file"
-	done }
-}
+    { inotifywait -r -m "$storageRemote" -e create --format "%w|%f" |
+        while IFS='|' read -r dir file; do
+            chmod g-w "$dir""$file"
+        done }
+    }
 
 usage() {
-	cat <<-EOF
-	Usage: homesync -arg
-	    -a  Online: Sync roaming home with local home, and network share with local storage 
-	        Offline: Change symlinks to local storage 
-	    -d	Setup local home directory structure
-	    -h	Show this help message and exit
-	    -k	Kill all homesync processes started by the user
-	    -l	Setup home directory symlinks according to mount status
-	    -r	Only sync network share with local storage
-	    -s	Only sync roaming home with local home
-	EOF
+    cat <<-EOF
+    Usage: homesync -arg
+        -a  Online: Sync roaming home with local home, and network share with local storage 
+            Offline: Change symlinks to local storage 
+        -d	Setup local home directory structure
+        -h	Show this help message and exit
+        -k	Kill all homesync processes started by the user
+        -l	Setup home directory symlinks according to mount status
+        -r	Only sync network share with local storage
+        -s	Only sync roaming home with local home
+    EOF
 }
 
 if [ $# -gt 0 ] && [[ $1 == -* ]]; then
-	proc=$$
-	conf="/etc/homesync.conf"
+    proc=$$
+    conf="/etc/homesync.conf"
 
-	trap 'exit 1' SIGUSR1
+    trap 'exit 1' SIGUSR1
 
-	if [ -f $conf ]; then
-		ldapURL=$(getConfig global LDAP_URL)
-		ldapDN=$(getConfig global LDAP_DN)
-		ldapMachineAttribute=$(getConfig global LDAP_MACHINE_ATTRIBUTE)
-		bindPath=$(getConfig global BIND_PATH)
-		storageRemote=$(getConfig global STORAGE_REMOTE)/$(getName)
-		storageLocal=$(getConfig global STORAGE_LOCAL)
-		storageLocalName=$(getConfig global STORAGE_LOCAL_NAME)
-		homeLocal=$(getConfig global HOME_LOCAL)/$USER
-		read -r -a unisonArgs <<< "$(getConfig global UNISON_ARGS)"
-		read -r -a storageDirsSync <<< "$(getConfig "$USER" STORAGE_DIRS_SYNC)"
-		read -r -a storageDirsNoSync <<< "$(getConfig "$USER" STORAGE_DIRS_NOSYNC)"
-		read -r -a homeDirs <<< "$(getConfig global HOME_DIRS)"
-		read -r -a homeFiles <<< "$(getConfig global HOME_FILES)"
+    if [ -f $conf ]; then
+        ldapURL=$(getConfig global LDAP_URL)
+        ldapDN=$(getConfig global LDAP_DN)
+        ldapMachineAttribute=$(getConfig global LDAP_MACHINE_ATTRIBUTE)
+        bindPath=$(getConfig global BIND_PATH)
+        storageRemote=$(getConfig global STORAGE_REMOTE)/$(getName)
+        storageLocal=$(getConfig global STORAGE_LOCAL)
+        storageLocalName=$(getConfig global STORAGE_LOCAL_NAME)
+        homeLocal=$(getConfig global HOME_LOCAL)/$USER
+        read -r -a unisonArgs <<< "$(getConfig global UNISON_ARGS)"
+        read -r -a storageDirsSync <<< "$(getConfig "$USER" STORAGE_DIRS_SYNC)"
+        read -r -a storageDirsNoSync <<< "$(getConfig "$USER" STORAGE_DIRS_NOSYNC)"
+        read -r -a homeDirs <<< "$(getConfig global HOME_DIRS)"
+        read -r -a homeFiles <<< "$(getConfig global HOME_FILES)"
 
-		while getopts 'adhklrs' arg; do
-		case $arg in
-			a)
-				checkLock
-				checkDependencies
-				debug
+        while getopts 'adhklrs' arg; do
+            case $arg in
+                a)
+                    checkLock
+                    checkDependencies
+                    debug
 
-				if checkMountpoint "$HOME"; then
-					setupHome
-					syncHome
-					symlinksStorage true
-					syncHandler 
-				else
-					symlinksStorage false
-				fi
+                    if checkMountpoint "$HOME"; then
+                        setupHome
+                        syncHome
+                        symlinksStorage true
+                        syncHandler 
+                    else
+                        symlinksStorage false
+                    fi
 
-				exit
-			;;
-			d)
-				debug
+                    exit
+                    ;;
+                d)
+                    debug
 
-				if checkMountpoint "$HOME"; then
-					setupHome
-					symlinksStorage true
-				fi
-			;;
-			h)
-				usage
-				exit 
-			;;
-			k)
-				pkill -P "$(pgrep -t "$(tty | cut -d "/" -f 3-)" -o homesync)"
-				exit
-			;;
-			l)
-				debug
+                    if checkMountpoint "$HOME"; then
+                        setupHome
+                        symlinksStorage true
+                    fi
+                    ;;
+                h)
+                    usage
+                    exit 
+                    ;;
+                k)
+                    pkill -P "$(pgrep -t "$(tty | cut -d "/" -f 3-)" -o homesync)"
+                    exit
+                    ;;
+                l)
+                    debug
 
-				if checkMountpoint "$HOME"; then
-					symlinksStorage true
-				else
-					symlinksStorage false
-				fi
+                    if checkMountpoint "$HOME"; then
+                        symlinksStorage true
+                    else
+                        symlinksStorage false
+                    fi
 
-				exit
-			;;
-			r)
-				checkLock
-				checkDependencies
-				debug
+                    exit
+                    ;;
+                r)
+                    checkLock
+                    checkDependencies
+                    debug
 
-				if checkMountpoint "$HOME"; then
-					syncHandler
-				fi
+                    if checkMountpoint "$HOME"; then
+                        syncHandler
+                    fi
 
-				exit
-			;;
-			s)
-				checkDependencies
-				debug
+                    exit
+                    ;;
+                s)
+                    checkDependencies
+                    debug
 
-				if checkMountpoint "$HOME"; then
-					syncHome
-				fi
+                    if checkMountpoint "$HOME"; then
+                        syncHome
+                    fi
 
-				exit
-			;;
-			*)
-				usage
-				exit 1
-			;;
-		esac
-		done
-	else
-		fatal "[ERROR] Configuration file not found." 
-	fi
+                    exit
+                    ;;
+                *)
+                    usage
+                    exit 1
+                    ;;
+            esac
+        done
+    else
+        fatal "[ERROR] Configuration file not found." 
+    fi
 else
-	echo "$0: missing argument"
-	usage
-	exit 1
+    echo "$0: missing argument"
+    usage
+    exit 1
 fi
