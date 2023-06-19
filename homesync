@@ -207,7 +207,7 @@ usage() {
         -l	Setup home directory symlinks according to mount status
         -r	Only sync network share with local storage
         -s	Only sync roaming home with local home
-    EOF
+	EOF
 }
 
 if [ $# -gt 0 ] && [[ $1 == -* ]]; then
