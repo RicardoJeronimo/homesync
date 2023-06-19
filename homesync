@@ -69,6 +69,8 @@ getShell() {
 
 setupHome() {
     userShell=$(getShell)
+    homesyncStart="homesync -a"
+    homesyncStop="homesync -s && homesync -k"
 
     if [ ! -d "$storageRemote" ] || [ -z "$(ls -A "$storageRemote")" ]; then
         for dir in "${storageDirsSync[@]}"; do
@@ -108,14 +110,16 @@ setupHome() {
         if [ "$userShell" == "/bin/bash" ]; then
             ln -sf "$homeLocal"/.bash_history "$HOME"/.bash_history
             cp /etc/skel/.{bash_logout,bashrc} "$HOME"
+            echo "$homesyncStop" >> "$HOME"/.bash_logout
         elif [ "$userShell" == "/bin/zsh" ]; then
             ln -sf "$homeLocal"/.zsh_history "$HOME"/.zsh_history
             touch "$HOME"/.zshrc
-            echo "homesync -a" >> "$HOME"/.zprofile
+            echo "$homesyncStart" >> "$HOME"/.zprofile
+            echo "$homesyncStop" >> "$HOME"/.zlogout
         fi
 
         cp /etc/skel/.profile "$HOME"
-		echo "homesync -a" >> "$HOME"/.profile
+		echo "$homesyncStart" >> "$HOME"/.profile
 
         for dir in "${homeDirs[@]}"; do
             ln -snf "$homeLocal"/"$dir" "$HOME"/"$dir"
