@@ -116,6 +116,7 @@ setupHome() {
         fi
 
         cp /etc/skel/.profile "$HOME"
+		echo "homesync -a" >> "$HOME"/.profile
 
         for dir in "${homeDirs[@]}"; do
             ln -snf "$homeLocal"/"$dir" "$HOME"/"$dir"
