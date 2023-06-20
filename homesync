@@ -206,7 +206,7 @@ usage() {
 	        Offline: Change symlinks to local storage 
 	    -d	Setup local home directory structure
 	    -h	Show this help message and exit
-	    -k	Kill all homesync processes started by the user
+	    -k	Kill all homesync processes started by the current user session
 	    -l	Setup home directory symlinks according to mount status
 	    -r	Only sync network share with local storage
 	    -s	Only sync roaming home with local home
