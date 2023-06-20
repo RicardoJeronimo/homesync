@@ -119,7 +119,7 @@ setupHome() {
         fi
 
         cp /etc/skel/.profile "$HOME"
-		echo "$homesyncStart" >> "$HOME"/.profile
+        echo "$homesyncStart" >> "$HOME"/.profile
 
         for dir in "${homeDirs[@]}"; do
             ln -snf "$homeLocal"/"$dir" "$HOME"/"$dir"
