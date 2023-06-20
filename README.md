@@ -19,137 +19,137 @@ Consider the directory stucture below. The server `server.domain.tld` provides t
 ```mermaid
 flowchart TB
     O1["    
-
+    <img src='https://super.so/icon/light/database.svg' />
     Disk Pool
     "]
 
     O2["
-
+    <img src='https://super.so/icon/light/hard-drive.svg' />
     /share
     "]
 
     O3["
-
+    <img src='https://super.so/icon/light/hard-drive.svg' />
     /ldap
     "]
 
     L1["
-
+    <img src='https://super.so/icon/light/home.svg' />
     /ldap/bob
     "]
 
     L2["
-
+    <img src='https://super.so/icon/light/file-text.svg' />
     .bash_history
     "]
 
     L3["
-
+    <img src='https://super.so/icon/light/file-text.svg' />
     .bash_logout
     "]
 
     L4["
-
+    <img src='https://super.so/icon/light/file-text.svg' />
     .bashrc
     "]
 
     L5["
-
+    <img src='https://super.so/icon/light/file-text.svg' />
     .vimrc
     "]
 
     L6["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     .cache
     "]
 
     L7["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Desktop
     "]
 
     L8["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Downloads
     "]
 
     L9["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Documents
     "]
 
     L10["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Images
     "]
 
     L11["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Music
     "]
 
     L12["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Videos
     "]
 
     H1["
-
+    <img src='https://super.so/icon/light/home.svg' />
     /home/ldap/bob
     "]
 
     H2["
-
+    <img src='https://super.so/icon/light/file-text.svg' />
     .bash_history
     "]
 
     H3["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     .cache
     "]
 
     H4["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Desktop
     "]
 
     H5["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Downloads
     "]
 
     S1["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Documents
     "]
 
     S2["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Images
     "]
 
     S3["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Music
     "]
 
     S4["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Videos
     "]
 
     A1["
-
+    <img src='https://super.so/icon/light/hard-drive.svg' />
     /share/users/Bob
     "]
 
     A2["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Documents
     "]
 
     A3["
-
+    <img src='https://super.so/icon/light/folder.svg' />
     Images
     "]
 
