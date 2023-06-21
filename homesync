@@ -209,7 +209,7 @@ usage() {
 	    -k	Kill all homesync processes started by the current user session
 	    -l	Setup home directory symlinks according to mount status
 	    -r	Only sync network share with local storage
-	    -s	Only sync roaming home with local home
+	    -s	Only sync roaming home with the underlying directory
 	EOF
 }
 
