@@ -88,13 +88,18 @@ homesync -arg
    sudo chmod +x /usr/bin/homesync
    ```
 
-2. Setup `homesync` to run at logon (e.g. on `.profile`):
+2. Allow your users to mount `BIND_PATH` without sudo on `/etc/fstab`:
+    ```bash
+    /       /mnt/bind       none        bind,user,noauto        0 0
+    ```
+
+3. Setup `homesync` to run at logon (e.g. on `.profile`):
    
    ```bash
    homesync -a
    ```
 
-3. Setup `homesync` to run at logoff (e.g. on `.bash_logout`):
+4. Setup `homesync` to run at logoff (e.g. on `.bash_logout`):
    
    ```bash
    homesync -d && homesync -k
