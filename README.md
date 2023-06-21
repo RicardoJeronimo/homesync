@@ -54,11 +54,11 @@ Homesync works in 2 stages:
 | `STORAGE_REMOTE`         | String  | Path of the mounted network share which contains your users' personal files (e.g. `/share/users`).                                                                                                                                                                      |
 | `STORAGE_LOCAL`          | String  | Path of the local directory which contains the user's personal files (e.g. `/storage`).<br>This directory is synchronized with `STORAGE_REMOTE` only if the current machine that is running homesync is the user's primary computer defined in `LDAP_MACHINE_ATTRIBUTE`.|
 | `STORAGE_LOCAL_NAME`     | String  | Name of the symbolic link that will be created in the user's home, and point to either `STORAGE_REMOTE` or `STORAGE_LOCAL`, depending on if the user is logged on with a roaming or local directory.                                                                    |
-| `STORAGE_DIRS_SYNC`      | String  | Space-separated list of directories to be synchronized between `STORAGE_REMOTE` and `STORAGE_LOCAL` (e.g. `Documents Images`).                                                                                                                                          |
-| `STORAGE_DIRS_NOSYNC`    | String  | Space-separated list of directories to be kept locally in `STORAGE_LOCAL` (e.g. `Music Videos`).                                                                                                                                                                        |
+| `STORAGE_DIRS_SYNC`      | String  | Space-separated list of directories to be synchronized between `STORAGE_REMOTE` and `STORAGE_LOCAL`, and symlinked in `$HOME` (e.g. `Documents Images`).                                                                                                                |
+| `STORAGE_DIRS_NOSYNC`    | String  | Space-separated list of directories to be kept locally in `STORAGE_LOCAL` and symlinked in `$HOME` (e.g. `Music Videos`).                                                                                                                                               |
 | `HOME_LOCAL`             | String  | Local diretory path which will store users' machine-specific files and folders (e.g. `/home/ldap`).                                                                                                                                                                     |
-| `HOME_DIRS`              | String  | Space-separated list of directories to be created locally in `HOME_LOCAL` and symlinked in `$HOME` during `homesync -d` (e.g. `.cache .local Desktop`).                                                                                                                 |
-| `HOME_FILES`             | String  | Space-separated list of files to be created locally in `HOME_LOCAL` and symlinked in `$HOME` during `homesync -d` (e.g. `.viminfo file.txt`).<br>The user's shell history dotfile is created automatically.                                                             |
+| `HOME_DIRS`              | String  | Space-separated list of directories to be created locally in `HOME_LOCAL` and symlinked in `$HOME` with `homesync -d` (e.g. `.cache .local Desktop`).                                                                                                                   |
+| `HOME_FILES`             | String  | Space-separated list of files to be created locally in `HOME_LOCAL` and symlinked in `$HOME` with `homesync -d` (e.g. `.viminfo file.txt`).<br>The user's shell history dotfile is created automatically.                                                               |
 
 &nbsp;
 
@@ -73,7 +73,7 @@ homesync -arg
     -k  Kill all homesync processes started by the current user session
     -l  Setup home directory symlinks according to mount status
     -r  Only sync network share with local storage
-    -s  Only sync roaming home with local home
+    -s  Only sync roaming home with the underlying directory
 ```
 
 &nbsp;
