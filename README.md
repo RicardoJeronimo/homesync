@@ -24,19 +24,19 @@ Consider the directory stucture below. The server `server.domain.tld` provides t
 
 Homesync works in 2 stages:
 
-- **Login:**
+**Login:**
   
-  1. The script will start by syncronizing `/ldap/bob` with the underlying directory that has been mounted over;
+1. The script will start by syncronizing `/ldap/bob` with the underlying directory that has been mounted over;
   
-  2. Home directory `/ldap/bob` symbolic links will point to either `/share/users/bob` (if mounted), or the local `/storage`;
-  
-  3. An `inotifywait` watcher will start to monitor `create`, `delete`, `modify` and `attrib` events on `/share` to continuously sync files with `/storage`, throughout the session, with `unison`.
+2. Home directory `/ldap/bob` symbolic links will point to either `/share/users/bob` (if mounted), or the local `/storage`;
 
-- **Logout:**
+3. An `inotifywait` watcher will start to monitor `create`, `delete`, `modify` and `attrib` events on `/share` to continuously sync files with `/storage`, throughout the session, with `unison`.
+
+**Logout:**
   
-  1. Home directory `/ldap/bob` is synchronized one last time;
-  
-  2. All homesync processes started by the current user session are killed (SIGTERM)
+1. Home directory `/ldap/bob` is synchronized one last time;
+
+2. All homesync processes started by the current user session are killed (SIGTERM)
 
 &nbsp;
 
