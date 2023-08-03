@@ -163,8 +163,6 @@ syncHandler() {
     if checkMountpoint "$(echo "$storageRemote" | cut -d "/" -f -2)"; then
         if [ "$HOSTNAME" == "$(getMachine)" ]; then
             syncRemote & 
-        else
-            syncWatch &
         fi   
     fi
 }
@@ -194,18 +192,7 @@ syncRemote() {
 
     { inotifywait -r -m "$storageRemote" -e create -e delete -e modify -e move -e attrib --format "%w|%e|%f" |
         while IFS='|' read -r dir action file; do
-            if [[ "$action" == *"CREATE"* ]]; then
-                chmod g-w "$dir""$file"
-            fi
-
             syncMain "$storageRemote" "$storageLocal"
-        done }
-}
-
-syncWatch() {
-    { inotifywait -r -m "$storageRemote" -e create --format "%w|%f" |
-        while IFS='|' read -r dir file; do
-            chmod g-w "$dir""$file"
         done }
 }
 
