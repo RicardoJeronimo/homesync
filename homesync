@@ -56,7 +56,17 @@ getConfig() {
 }
 
 getMachine() {
-    ldapsearch -x -LLL -H "$ldapURL" -b "$ldapDN" cn="$USER" | grep "$ldapMachineAttribute" | tr -d " " | cut -d ":" -f 2
+    if [ "$ldapBind" != "false" ]; then
+        ldapUser=$(ldapsearch -x -H "$ldapURL" -LLL -D "$ldapBind" -w "$ldapBindPW" -b "$ldapDN" cn="$USER")
+    else
+        ldapUser=$(ldapsearch -x -H "$ldapURL" -LLL -b "$ldapDN" cn="$USER")
+    fi
+
+    if [ "$?" -eq 0 ]; then
+        echo "$ldapUser" | grep "$ldapMachineAttribute" | tr -d " " | cut -d ":" -f 2
+    else
+        fatal "[ERROR] LDAP bind failed."
+    fi
 }
 
 getName() {
@@ -222,6 +232,8 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
     if [ -f $conf ]; then
         ldapURL=$(getConfig global LDAP_URL)
         ldapDN=$(getConfig global LDAP_DN)
+        ldapBind=$(getConfig global LDAP_BIND)
+        ldapBindPW=$(getConfig global LDAP_BIND_PW)
         ldapMachineAttribute=$(getConfig global LDAP_MACHINE_ATTRIBUTE)
         bindPath=$(getConfig global BIND_PATH)
         storageRemote=$(getConfig global STORAGE_REMOTE)/$(getName)
