@@ -82,12 +82,14 @@ setupHome() {
     homesyncStart="homesync -a"
     homesyncStop="homesync -s && homesync -k"
 
-    if [ ! -d "$storageRemote" ] || [ -z "$(ls -A "$storageRemote")" ]; then
-        for dir in "${storageDirsSync[@]}"; do
-            mkdir -p "$storageRemote"/"$dir"
-        done
+    if [ ! "$(du "$storageRemoteBase" 2> /dev/null | cut -f 1)" -eq 0 ]; then
+        if [ ! -d "$storageRemote" ] || [ -z "$(ls -A "$storageRemote")" ]; then
+            for dir in "${storageDirsSync[@]}"; do
+                mkdir -p "$storageRemote"/"$dir"
+            done
 
-        chmod -R 750 "$storageRemote"
+            chmod -R 750 "$storageRemote"
+        fi
     fi
 
     if [ ! -d "$storageLocal" ] || [ -z "$(ls -A "$storageLocal")" ]; then
@@ -160,7 +162,7 @@ symlinksStorage() {
 }
 
 syncHandler() {
-    if checkMountpoint "$(echo "$storageRemote" | cut -d "/" -f -2)"; then
+    if checkMountpoint "$storageRemoteBase"; then
         if [ "$HOSTNAME" == "$(getMachine)" ]; then
             syncRemote & 
         fi   
@@ -224,6 +226,7 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
         ldapMachineAttribute=$(getConfig global LDAP_MACHINE_ATTRIBUTE)
         bindPath=$(getConfig global BIND_PATH)
         storageRemote=$(getConfig global STORAGE_REMOTE)/$(getName)
+        storageRemoteBase=$(echo "$storageRemote" | cut -d "/" -f -2)
         storageLocal=$(getConfig global STORAGE_LOCAL)
         storageLocalName=$(getConfig global STORAGE_LOCAL_NAME)
         homeLocal=$(getConfig global HOME_LOCAL)/$USER
