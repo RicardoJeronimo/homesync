@@ -235,6 +235,7 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
         read -r -a storageDirsNoSync <<< "$(getConfig "$USER" STORAGE_DIRS_NOSYNC)"
         read -r -a homeDirs <<< "$(getConfig global HOME_DIRS)"
         read -r -a homeFiles <<< "$(getConfig global HOME_FILES)"
+        export UNISON=/tmp/.unison/$USER
 
         while getopts 'adhklrs' arg; do
             case $arg in
