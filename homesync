@@ -127,7 +127,7 @@ setupHome() {
             echo "$homesyncStop" >> "$HOME"/.bash_logout
         elif [ "$userShell" == "/bin/zsh" ]; then
             ln -sf "$homeLocal"/.zsh_history "$HOME"/.zsh_history
-            touch "$HOME"/.zshrc
+            echo "HISTFILE=/home/ldap/$USER/.zsh_history" > "$HOME"/.zshrc
             echo "$homesyncStart" >> "$HOME"/.zprofile
             echo "$homesyncStop" >> "$HOME"/.zlogout
         fi
@@ -141,6 +141,13 @@ setupHome() {
 
         for file in "${homeFiles[@]}"; do
             ln -sf "$homeLocal"/"$file" "$HOME"/"$file"
+
+            if [ "$file" == ".viminfo" ]; then
+                cat <<-EOF > "$HOME"/.vimrc
+				source \$VIMRUNTIME/defaults.vim
+				set viminfo+=n$homeLocal/$file
+				EOF
+            fi
         done
     fi
 }
