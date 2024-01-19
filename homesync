@@ -156,9 +156,11 @@ symlinksStorage() {
         ln -snf "$origin"/"$dir" "$HOME"/"$dir"
     done
 
-    for dir in "${storageDirsNoSync[@]}"; do
-        ln -snf "$storageLocal"/"$dir" "$HOME"/"$dir"
-    done
+    if [ "${storageDirsNoSync[0]}" != "false" ]; then
+        for dir in "${storageDirsNoSync[@]}"; do
+            ln -snf "$storageLocal"/"$dir" "$HOME"/"$dir"
+        done
+    fi
 
     ln -snf "$origin" "$HOME"/"$storageLocalName"
 }
