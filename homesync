@@ -92,12 +92,14 @@ setupHome() {
         fi
     fi
 
-    if [ ! -d "$storageLocal" ] || [ -z "$(ls -A "$storageLocal")" ]; then
-        for dir in "${storageDirsNoSync[@]}"; do
-            mkdir -p "$storageLocal"/"$dir"
-        done
+    if [ "${storageDirsNoSync[0]}" != "false" ]; then
+        if [ ! -d "$storageLocal" ] || [ -z "$(ls -A "$storageLocal")" ]; then
+            for dir in "${storageDirsNoSync[@]}"; do
+                mkdir -p "$storageLocal"/"$dir"
+            done
 
-        chmod -R 750 "$storageLocal"
+            chmod -R 750 "$storageLocal"
+        fi
     fi
 
     if [ ! -d "$homeLocal" ] || [ -z "$(ls -A "$homeLocal")" ]; then
