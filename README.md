@@ -84,17 +84,17 @@ homesync -arg
 
 1. Install dependencies:
 
-```bash
+    ```bash
     sudo apt install inotify-tools ldap-utils unison
-```
+    ```
 
 2. Download the script and its configuration file to their respective destination:
    
-   ```bash
-   sudo wget https://raw.githubusercontent.com/RicardoJeronimo/homesync/master/homesync -O /usr/bin/homesync;
-   sudo wget https://raw.githubusercontent.com/RicardoJeronimo/homesync/master/homesync.conf -O /etc/homesync.conf;
-   sudo chmod +x /usr/bin/homesync
-   ```
+    ```bash
+    sudo wget https://raw.githubusercontent.com/RicardoJeronimo/homesync/master/homesync -O /usr/bin/homesync;
+    sudo wget https://raw.githubusercontent.com/RicardoJeronimo/homesync/master/homesync.conf -O /etc/homesync.conf;
+    sudo chmod +x /usr/bin/homesync
+    ```
 
 3. Allow your users to mount `BIND_PATH` without sudo on `/etc/fstab`:
 
@@ -104,12 +104,12 @@ homesync -arg
 
 4. Setup `homesync` to run at logon (e.g. on `.profile`):
    
-   ```bash
-   homesync -a
-   ```
+    ```bash
+    homesync -a
+    ```
 
 5. Setup `homesync` to run at logoff (e.g. on `.bash_logout`):
    
-   ```bash
-   homesync -d && homesync -k
-   ```
+    ```bash
+    homesync -d && homesync -k
+    ```
