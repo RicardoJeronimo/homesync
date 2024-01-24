@@ -315,6 +315,8 @@ if [ $# -gt 0 ] && [[ $1 == -* ]]; then
 
                     if checkMountpoint "$HOME"; then
                         syncHome
+                    elif [[ ! $(stat -f -L -c %T "$storageRemoteBase" 2> /dev/null) =~ ^(autofs|nfs|smb|^$) ]]; then
+                        syncHome
                     fi
 
                     exit
