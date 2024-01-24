@@ -40,30 +40,6 @@ Homesync works in 2 stages:
 
 &nbsp;
 
-### Configuration
-
-| Name                     | Type    | Description                                                                                                                                                                                                                                                             |
-| ------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DEBUG`                  | Boolean | If events should be logged in `LOG_FILE`.                                                                                                                                                                                                                               |
-| `LOG_FILE`               | String  | Where `DEBUG` will log events. By default it's `~/.log/homesync.log`.                                                                                                                                                                                                   |
-| `LDAP_URL`               | String  | Can be configured with an FQDN or IP address (e.g. `ldap://domain.tld`).                                                                                                                                                                                                |
-| `LDAP_DN`                | String  | Your domain's full distinguished name (e.g. `dc=domain,dc=tld`).                                                                                                                                                                                                        |
-| `LDAP_BIND`              | String  | Optional user that will bind to the LDAP server (e.g. `cn=username,dc=domain,dc=tld`).<br>Since `LDAP_BIND_PW` is stored in plaintext, it's recommended to create a [read-only user](https://github.com/osixia/docker-openldap/tree/master/image/service/slapd/assets/config/bootstrap/ldif/readonly-user).                                                                                                                                                  |
-| `LDAP_BIND_PW`           | String  | Plaintext `LDAP_BIND` user password.                                          |
-| `LDAP_MACHINE_ATTRIBUTE` | String  | Any field in your LDAP user entry where you can define its own primary computer hostname for local storage syncronization.<br>By default it's inetOrgPerson `homePostalAddress`.                                                                                        |
-| `BIND_PATH`              | String  | Location where `/` will be bind mounted on `homesync -s` (e.g. `/mnt/bind`).<br>This is used to sync the user's roaming home with the underlying directory which has been mounted over.                                                                                 |
-| `UNISON_ARGS`            | String  | Space-separated list of options to use during syncs (e.g. `-batch -silent -log=false -owner -group -prefer=newer`).<br>For more options, refer to the [unison repository](https://github.com/bcpierce00/unison).                                                        |
-| `STORAGE_REMOTE`         | String  | Path of the mounted network share which contains your users' personal files (e.g. `/share/users`).                                                                                                                                                                      |
-| `STORAGE_LOCAL`          | String  | Path of the local directory which contains the user's personal files (e.g. `/storage`).<br>This directory is synchronized with `STORAGE_REMOTE` only if the current machine that is running homesync is the user's primary computer defined in `LDAP_MACHINE_ATTRIBUTE`.|
-| `STORAGE_LOCAL_NAME`     | String  | Name of the symbolic link that will be created in the user's home, and point to either `STORAGE_REMOTE` or `STORAGE_LOCAL`, depending on if the user is logged on with a roaming or local directory.                                                                    |
-| `STORAGE_DIRS_SYNC`      | String  | Space-separated list of directories to be synchronized between `STORAGE_REMOTE` and `STORAGE_LOCAL`, and symlinked in `$HOME` (e.g. `Documents Images`).                                                                                                                |
-| `STORAGE_DIRS_NOSYNC`    | String  | Space-separated list of directories to be kept locally in `STORAGE_LOCAL` and symlinked in `$HOME` (e.g. `Music Videos`).                                                                                                                                               |
-| `HOME_LOCAL`             | String  | Local diretory path which will store users' machine-specific files and folders (e.g. `/home/ldap`).                                                                                                                                                                     |
-| `HOME_DIRS`              | String  | Space-separated list of directories to be created locally in `HOME_LOCAL` and symlinked in `$HOME` with `homesync -d` (e.g. `.cache .local Desktop`).                                                                                                                   |
-| `HOME_FILES`             | String  | Space-separated list of files to be created locally in `HOME_LOCAL` and symlinked in `$HOME` with `homesync -d` (e.g. `.viminfo file.txt`).<br>The user's shell history dotfile is created automatically.                                                               |
-
-&nbsp;
-
 ### Usage
 
 ```
@@ -80,9 +56,39 @@ homesync -arg
 
 &nbsp;
 
+### Configuration
+
+| Name                     | Type    | Description                                                                                                                                                                                                                                                             |
+| ------------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DEBUG`                  | Boolean | If events should be logged in `LOG_FILE`.                                                                                                                                                                                                                               |
+| `LOG_FILE`               | String  | Where `DEBUG` will log events. By default it's `~/.log/homesync.log`.                                                                                                                                                                                                   |
+| `LDAP_URL`               | String  | Can be configured with an FQDN or IP address (e.g. `ldap://domain.tld`).                                                                                                                                                                                                |
+| `LDAP_DN`                | String  | Your domain's full distinguished name (e.g. `dc=domain,dc=tld`).                                                                                                                                                                                                        |
+| `LDAP_BIND`              | String  | Optional user that will bind to the LDAP server (e.g. `cn=username,dc=domain,dc=tld`). Can be set to `false`.<br>Since `LDAP_BIND_PW` is stored in plaintext, it's recommended to create a [read-only user](https://github.com/osixia/docker-openldap/tree/master/image/service/slapd/assets/config/bootstrap/ldif/readonly-user).                                                                                                                                                                               |
+| `LDAP_BIND_PW`           | String  | Plaintext `LDAP_BIND` user password.                                          |
+| `LDAP_MACHINE_ATTRIBUTE` | String  | Any field in your LDAP user entry where you can define its own primary computer hostname for local storage syncronization.<br>By default it's inetOrgPerson `homePostalAddress`.                                                                                        |
+| `BIND_PATH`              | String  | Location where `/` will be bind mounted on `homesync -s` (e.g. `/mnt/bind`).<br>This is used to sync the user's roaming home with the underlying directory which has been mounted over.                                                                                 |
+| `UNISON_ARGS`            | String  | Space-separated list of options to use during syncs (e.g. `-batch -silent -log=false -owner -group -prefer=newer`).<br>For more options, refer to the [unison repository](https://github.com/bcpierce00/unison).                                                        |
+| `STORAGE_REMOTE`         | String  | Path of the mounted network share which contains your users' personal files (e.g. `/share/users`).                                                                                                                                                                      |
+| `STORAGE_LOCAL`          | String  | Path of the local directory which contains the user's personal files (e.g. `/storage`).<br>This directory is synchronized with `STORAGE_REMOTE` only if the current machine that is running homesync is the user's primary computer defined in `LDAP_MACHINE_ATTRIBUTE`.|
+| `STORAGE_LOCAL_NAME`     | String  | Name of the symbolic link that will be created in the user's home, and point to either `STORAGE_REMOTE` or `STORAGE_LOCAL`, depending on if the user is logged on with a roaming or local directory.                                                                    |
+| `STORAGE_DIRS_SYNC`      | String  | Space-separated list of directories to be synchronized between `STORAGE_REMOTE` and `STORAGE_LOCAL`, and symlinked in `$HOME` (e.g. `Documents Images`).                                                                                                                |
+| `STORAGE_DIRS_NOSYNC`    | String  | Optional space-separated list of directories to be kept locally in `STORAGE_LOCAL` and symlinked in `$HOME` (e.g. `Music Videos`).<br>Can be set to `false`.                                                                                                            |
+| `HOME_LOCAL`             | String  | Local diretory path which will store users' machine-specific files and folders (e.g. `/home/ldap`).                                                                                                                                                                     |
+| `HOME_DIRS`              | String  | Space-separated list of directories to be created locally in `HOME_LOCAL` and symlinked in `$HOME` with `homesync -d` (e.g. `.cache .local Desktop`).                                                                                                                   |
+| `HOME_FILES`             | String  | Space-separated list of files to be created locally in `HOME_LOCAL` and symlinked in `$HOME` with `homesync -d` (e.g. `.viminfo file.txt`).<br>The user's shell history dotfile is created automatically.                                                               |
+
+&nbsp;
+
 ### Installation
 
-1. Download the script and its configuration file to their destination:
+1. Install dependencies:
+
+```bash
+    sudo apt install inotify-tools ldap-utils unison
+```
+
+2. Download the script and its configuration file to their respective destination:
    
    ```bash
    sudo wget https://raw.githubusercontent.com/RicardoJeronimo/homesync/master/homesync -O /usr/bin/homesync;
@@ -90,18 +96,19 @@ homesync -arg
    sudo chmod +x /usr/bin/homesync
    ```
 
-2. Allow your users to mount `BIND_PATH` without sudo on `/etc/fstab`:
+3. Allow your users to mount `BIND_PATH` without sudo on `/etc/fstab`:
+
     ```bash
     /       /mnt/bind       none        bind,user,noauto        0 0
     ```
 
-3. Setup `homesync` to run at logon (e.g. on `.profile`):
+4. Setup `homesync` to run at logon (e.g. on `.profile`):
    
    ```bash
    homesync -a
    ```
 
-4. Setup `homesync` to run at logoff (e.g. on `.bash_logout`):
+5. Setup `homesync` to run at logoff (e.g. on `.bash_logout`):
    
    ```bash
    homesync -d && homesync -k
